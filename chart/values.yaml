@@ -1,0 +1,105 @@
+---
+# -- Namespace and project name for the student environments.
+projectName: "k8s-student"
+projectNamespaceLabels:
+  {}
+  # -- Labels to apply to the project namespace.
+  # @default -- {}
+  # security: "restricted"
+  # educational: "true"
+
+oidc:
+  # -- Enable OIDC Groups for Role-Based Access Control (RBAC)
+  enabled: true
+  # -- OIDC Provider Group Prefix (e.g., "oidc:/", "oidc:group/")
+  groupPrefix: "oidc:/"
+
+argo:
+  # -- Default namespace for the ArgoCD Installation
+  appOfAppsNamespace: "argocd"
+  # -- Git repository URL containing the customer ArgoCD applications
+  targetRepoURL: "https://github.com/GoodMannersHosting/home-enterprise-education.git"
+  # -- Git branch or tag to use from the targetRepoURL
+  targetRevision: "main"
+  # -- Optional path prefix within the repository for all applications
+  pathPrefix: ""
+  # -- Optional path suffix within the repository for all applications
+  pathSuffix: "applications"
+  # -- Optional complete path override within the repository for all applications
+  pathOverride: ""
+  # -- Optional: Custom role policies for ArgoCD RBAC (https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/)
+  customRolePolicies: []
+  namespaceResources:
+    # -- Pass the blacklist to allow fine control over what is permitted to be deployed in the project namespace.
+    blacklist:
+      - group: ""
+        kind: "ResourceQuota"
+      - group: "ceph.rook.io"
+        kind: "*"
+      - group: "argoproj.io"
+        kind: "appprojects"
+    # -- Pass the whitelist to allow fine control over what is permitted to be deployed in the project namespace.
+    whitelist:
+      - group: "*"
+        kind: "*"
+  clusterResources:
+    # -- Pass the blacklist to allow fine control over what is permitted to be deployed in the cluster.
+    # @default -- [{"group": "*", "kind": "*"}]
+    blacklist:
+      - group: "*"
+        kind: "*"
+    # -- Pass the whitelist to allow fine control over what is permitted to be deployed in the cluster.
+    # @default -- [{"group": "", "kind": "persistentvolumes"}]
+    whitelist:
+      - group: ""
+        kind: "persistentvolumes"
+
+rbac:
+  # -- Enable full access to all namespaced resources in the project namespace.
+  #    This is the recommended setting for student namespaces to allow maximum flexibility.
+  # @default -- true
+  fullAccessNamespacedResources: true
+  # -- Enable read-only access to a restricted set of namespaced resources in the project namespace.
+  readOnlyRestrictedNamespacedResources:
+    # Exclude ResourceQuotas, ceph.rook.io, and appproject.argoproj.io using separate deny rules (not natively supported in Kubernetes RBAC).
+    # You must ensure there are no other Roles granting access to these resources.
+    - apiGroups: [""]
+      resources: ["resourcequotas"]
+    - apiGroups: ["ceph.rook.io"]
+      resources: ["*"]
+    - apiGroups: ["appproject.argoproj.io"]
+      resources: ["*"]
+  # -- Enable read-only access to a restricted set of cluster-wide resources.
+  #    This is useful to allow students to view cluster resources without granting full access.
+  readOnlyAllowedClusterResources:
+    - apiGroups: ["storage.k8s.io"]
+      resources: ["storageclasses"]
+    - apiGroups: [""]
+      resources:
+        ["namespaces", "persistentvolumes", "nodes", "persistentvolumeclaims"]
+
+quotas:
+  compute:
+    # -- Compute resource quotas for the project namespace. Can be an integer or m (milli) suffix for CPU; must end in '00m' if using millicores.
+    cpu: "6000m" # Can pass an integer or m (milli) suffix for CPU; must end in '00m' if using millicores.
+    # -- Memory resource quota for the project namespace. Must end in 'Mi' or 'Gi'.
+    memory: "12Gi"
+    # -- Ephemeral storage resource quota for the project namespace. Must end in 'Gi'.
+    ephemeralStorage: "20Gi"
+  storage:
+    # -- Maximum number of Persistent Volume Claims (PVCs) allowed in the project namespace. Set to 0 for no PVCs allowed.
+    maxPvc: "10" # Number of Persistent Volume Claims
+    requests:
+      # -- Minimum storage request size for PVCs in the project namespace. Must end in 'Gi'.
+      min: "1Gi"
+      # -- Maximum storage request size for PVCs in the project namespace. Must end in 'Gi'.
+      max: "8Gi"
+  gpu:
+    # -- Enable GPU quota for the project namespace.
+    enabled: true
+    # -- GPU resource quota for the project namespace. Set to 0 for no GPUs allowed.
+    count: "0" # Number of GPUs
+
+clusterRole:
+  # -- Enable cluster role binding for the project namespace.
+  enabled: true

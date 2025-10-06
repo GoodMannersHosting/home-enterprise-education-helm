@@ -1,0 +1,36 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: &ns {{ include "projectName" . | quote }}
+  namespace: {{ .Values.argo.appOfAppsNamespace | default "argocd" | quote }}
+spec:
+  description: {{ printf "Educational environment for the %s Namespace" (include "projectName" .) | quote }}
+  roles:
+  - name: admin
+    description: "Admins can do anything for their project"
+    groups:
+    - *ns
+    policies:
+    - {{ printf "p, proj:%s:admin, *, *, *, allow" .Values.projectName | quote -}}
+{{ if .Values.argo.customRolePolicies }}
+{{ range $role := .Values.argo.customRolePolicies }}
+    - {{ $role | quote -}}
+{{- end }}
+{{- end }}
+  clusterResourceBlacklist:
+  {{- include "argo.clusterResourceBlacklist" . | indent 2 }}
+  clusterResourceWhitelist:
+  {{- include "argo.clusterResourceWhitelist" . | indent 2 }}
+  destinations:
+  # {{ printf "Allow deployments to %s namespace" .Values.projectName }}
+  - namespace: *ns
+    server: https://kubernetes.default.svc
+  sourceNamespaces:
+  - *ns
+  namespaceResourceWhitelist:
+  {{- include "argo.namespaceResourceWhitelist" . | indent 2 }}
+  namespaceResourceBlacklist:
+  {{- include "argo.namespaceResourceBlacklist" . | indent 2 }}
+  sourceRepos:
+  - "*"

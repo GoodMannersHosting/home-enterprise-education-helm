@@ -1,0 +1,17 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ printf "project:%s" (include "projectName" .) | quote }}
+  namespace: {{ (include "projectName" .) | quote }}
+rules:
+{{ if .Values.rbac.fullAccessNamespacedResources -}}
+- apiGroups: [ "*" ]
+  resources: [ "*" ]
+  verbs: [ "*" ]
+{{- end -}}
+{{- range $index, $resource := .Values.rbac.readOnlyAllowedClusterResources }}
+- apiGroups: {{ $resource.apiGroups }}
+  resources: {{ $resource.resources }}
+  verbs: [ "list", "get", "watch" ]
+{{- end }}

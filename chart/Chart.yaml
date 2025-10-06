@@ -1,0 +1,6 @@
+apiVersion: v2
+name: learning-environment
+description: A comprehensive multi-tenant Kubernetes learning environment that provides isolated, resource-controlled namespaces for developers and engineers to safely experiment and learn. Features automated RBAC with OIDC integration, configurable resource quotas (CPU, memory, storage, GPU), ArgoCD-powered GitOps application deployment, and granular security controls - delivering a complete sandbox environment for hands-on Kubernetes education in production clusters.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

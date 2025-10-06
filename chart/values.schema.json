@@ -1,0 +1,700 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "argo": {
+      "additionalProperties": false,
+      "properties": {
+        "appOfAppsNamespace": {
+          "default": "argocd",
+          "description": "Default namespace for the ArgoCD Installation",
+          "required": [],
+          "title": "appOfAppsNamespace",
+          "type": "string"
+        },
+        "clusterResources": {
+          "additionalProperties": false,
+          "properties": {
+            "blacklist": {
+              "description": "Pass the blacklist to allow fine control over what is permitted to be deployed in the cluster.",
+              "items": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "group": {
+                        "default": "*",
+                        "required": [],
+                        "title": "group",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "default": "*",
+                        "required": [],
+                        "title": "kind",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "kind"
+                    ],
+                    "type": "object"
+                  }
+                ],
+                "required": []
+              },
+              "required": [],
+              "title": "blacklist",
+              "type": "array"
+            },
+            "whitelist": {
+              "description": "Pass the whitelist to allow fine control over what is permitted to be deployed in the cluster.",
+              "items": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "group": {
+                        "default": "",
+                        "required": [],
+                        "title": "group",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "default": "persistentvolumes",
+                        "required": [],
+                        "title": "kind",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "kind"
+                    ],
+                    "type": "object"
+                  }
+                ],
+                "required": []
+              },
+              "required": [],
+              "title": "whitelist",
+              "type": "array"
+            }
+          },
+          "required": [
+            "blacklist",
+            "whitelist"
+          ],
+          "title": "clusterResources",
+          "type": "object"
+        },
+        "customRolePolicies": {
+          "description": "Optional: Custom role policies for ArgoCD RBAC (https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/)",
+          "items": {
+            "required": []
+          },
+          "required": [],
+          "title": "customRolePolicies",
+          "type": "array"
+        },
+        "namespaceResources": {
+          "additionalProperties": false,
+          "properties": {
+            "blacklist": {
+              "description": "Pass the blacklist to allow fine control over what is permitted to be deployed in the project namespace.",
+              "items": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "group": {
+                        "default": "",
+                        "required": [],
+                        "title": "group",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "default": "ResourceQuota",
+                        "required": [],
+                        "title": "kind",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "kind"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "group": {
+                        "default": "ceph.rook.io",
+                        "required": [],
+                        "title": "group",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "default": "*",
+                        "required": [],
+                        "title": "kind",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "kind"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "group": {
+                        "default": "argoproj.io",
+                        "required": [],
+                        "title": "group",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "default": "appprojects",
+                        "required": [],
+                        "title": "kind",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "kind"
+                    ],
+                    "type": "object"
+                  }
+                ],
+                "required": []
+              },
+              "required": [],
+              "title": "blacklist",
+              "type": "array"
+            },
+            "whitelist": {
+              "description": "Pass the whitelist to allow fine control over what is permitted to be deployed in the project namespace.",
+              "items": {
+                "anyOf": [
+                  {
+                    "additionalProperties": false,
+                    "properties": {
+                      "group": {
+                        "default": "*",
+                        "required": [],
+                        "title": "group",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "default": "*",
+                        "required": [],
+                        "title": "kind",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "kind"
+                    ],
+                    "type": "object"
+                  }
+                ],
+                "required": []
+              },
+              "required": [],
+              "title": "whitelist",
+              "type": "array"
+            }
+          },
+          "required": [
+            "blacklist",
+            "whitelist"
+          ],
+          "title": "namespaceResources",
+          "type": "object"
+        },
+        "pathOverride": {
+          "default": "",
+          "description": "Optional complete path override within the repository for all applications",
+          "required": [],
+          "title": "pathOverride",
+          "type": "string"
+        },
+        "pathPrefix": {
+          "default": "",
+          "description": "Optional path prefix within the repository for all applications",
+          "required": [],
+          "title": "pathPrefix",
+          "type": "string"
+        },
+        "pathSuffix": {
+          "default": "applications",
+          "description": "Optional path suffix within the repository for all applications",
+          "required": [],
+          "title": "pathSuffix",
+          "type": "string"
+        },
+        "targetRepoURL": {
+          "default": "https://github.com/GoodMannersHosting/home-enterprise-education.git",
+          "description": "Git repository URL containing the customer ArgoCD applications",
+          "required": [],
+          "title": "targetRepoURL",
+          "type": "string"
+        },
+        "targetRevision": {
+          "default": "main",
+          "description": "Git branch or tag to use from the targetRepoURL",
+          "required": [],
+          "title": "targetRevision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "appOfAppsNamespace",
+        "targetRepoURL",
+        "targetRevision",
+        "pathPrefix",
+        "pathSuffix",
+        "pathOverride",
+        "customRolePolicies",
+        "namespaceResources",
+        "clusterResources"
+      ],
+      "title": "argo",
+      "type": "object"
+    },
+    "clusterRole": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Enable cluster role binding for the project namespace.",
+          "required": [],
+          "title": "enabled",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "title": "clusterRole",
+      "type": "object"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "oidc": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "default": true,
+          "description": "Enable OIDC Groups for Role-Based Access Control (RBAC)",
+          "required": [],
+          "title": "enabled",
+          "type": "boolean"
+        },
+        "groupPrefix": {
+          "default": "oidc:/",
+          "description": "OIDC Provider Group Prefix (e.g., \"oidc:/\", \"oidc:group/\")",
+          "required": [],
+          "title": "groupPrefix",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "groupPrefix"
+      ],
+      "title": "oidc",
+      "type": "object"
+    },
+    "projectName": {
+      "default": "k8s-student",
+      "description": "Namespace and project name for the student environments.",
+      "required": [],
+      "title": "projectName",
+      "type": "string"
+    },
+    "projectNamespaceLabels": {
+      "additionalProperties": false,
+      "required": [],
+      "title": "projectNamespaceLabels",
+      "type": "object"
+    },
+    "quotas": {
+      "additionalProperties": false,
+      "properties": {
+        "compute": {
+          "additionalProperties": false,
+          "properties": {
+            "cpu": {
+              "default": "6000m",
+              "description": "Compute resource quotas for the project namespace. Can be an integer or m (milli) suffix for CPU; must end in '00m' if using millicores.",
+              "required": [],
+              "title": "cpu",
+              "type": "string"
+            },
+            "ephemeralStorage": {
+              "default": "20Gi",
+              "description": "Ephemeral storage resource quota for the project namespace. Must end in 'Gi'.",
+              "required": [],
+              "title": "ephemeralStorage",
+              "type": "string"
+            },
+            "memory": {
+              "default": "12Gi",
+              "description": "Memory resource quota for the project namespace. Must end in 'Mi' or 'Gi'.",
+              "required": [],
+              "title": "memory",
+              "type": "string"
+            }
+          },
+          "required": [
+            "cpu",
+            "memory",
+            "ephemeralStorage"
+          ],
+          "title": "compute",
+          "type": "object"
+        },
+        "gpu": {
+          "additionalProperties": false,
+          "properties": {
+            "count": {
+              "default": "0",
+              "description": "GPU resource quota for the project namespace. Set to 0 for no GPUs allowed.",
+              "required": [],
+              "title": "count",
+              "type": "string"
+            },
+            "enabled": {
+              "default": true,
+              "description": "Enable GPU quota for the project namespace.",
+              "required": [],
+              "title": "enabled",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enabled",
+            "count"
+          ],
+          "title": "gpu",
+          "type": "object"
+        },
+        "storage": {
+          "additionalProperties": false,
+          "properties": {
+            "maxPvc": {
+              "default": "10",
+              "description": "Maximum number of Persistent Volume Claims (PVCs) allowed in the project namespace. Set to 0 for no PVCs allowed.",
+              "required": [],
+              "title": "maxPvc",
+              "type": "string"
+            },
+            "requests": {
+              "additionalProperties": false,
+              "properties": {
+                "max": {
+                  "default": "8Gi",
+                  "description": "Maximum storage request size for PVCs in the project namespace. Must end in 'Gi'.",
+                  "required": [],
+                  "title": "max",
+                  "type": "string"
+                },
+                "min": {
+                  "default": "1Gi",
+                  "description": "Minimum storage request size for PVCs in the project namespace. Must end in 'Gi'.",
+                  "required": [],
+                  "title": "min",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "min",
+                "max"
+              ],
+              "title": "requests",
+              "type": "object"
+            }
+          },
+          "required": [
+            "maxPvc",
+            "requests"
+          ],
+          "title": "storage",
+          "type": "object"
+        }
+      },
+      "required": [
+        "compute",
+        "storage",
+        "gpu"
+      ],
+      "title": "quotas",
+      "type": "object"
+    },
+    "rbac": {
+      "additionalProperties": false,
+      "properties": {
+        "fullAccessNamespacedResources": {
+          "default": true,
+          "description": "Enable full access to all namespaced resources in the project namespace.\n   This is the recommended setting for student namespaces to allow maximum flexibility.",
+          "required": [],
+          "title": "fullAccessNamespacedResources",
+          "type": "boolean"
+        },
+        "readOnlyAllowedClusterResources": {
+          "description": "Enable read-only access to a restricted set of cluster-wide resources.\n   This is useful to allow students to view cluster resources without granting full access.",
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "apiGroups",
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "resources",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "apiGroups",
+                  "resources"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "apiGroups",
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        },
+                        {
+                          "required": [],
+                          "type": "string"
+                        },
+                        {
+                          "required": [],
+                          "type": "string"
+                        },
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "resources",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "apiGroups",
+                  "resources"
+                ],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "required": [],
+          "title": "readOnlyAllowedClusterResources",
+          "type": "array"
+        },
+        "readOnlyRestrictedNamespacedResources": {
+          "description": "Enable read-only access to a restricted set of namespaced resources in the project namespace.",
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "apiGroups",
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "resources",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "apiGroups",
+                  "resources"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "apiGroups",
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "resources",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "apiGroups",
+                  "resources"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "apiGroups": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "apiGroups",
+                    "type": "array"
+                  },
+                  "resources": {
+                    "items": {
+                      "anyOf": [
+                        {
+                          "required": [],
+                          "type": "string"
+                        }
+                      ],
+                      "required": []
+                    },
+                    "required": [],
+                    "title": "resources",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "apiGroups",
+                  "resources"
+                ],
+                "type": "object"
+              }
+            ],
+            "required": []
+          },
+          "required": [],
+          "title": "readOnlyRestrictedNamespacedResources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fullAccessNamespacedResources",
+        "readOnlyRestrictedNamespacedResources",
+        "readOnlyAllowedClusterResources"
+      ],
+      "title": "rbac",
+      "type": "object"
+    }
+  },
+  "required": [
+    "projectName",
+    "projectNamespaceLabels",
+    "oidc",
+    "argo",
+    "rbac",
+    "quotas",
+    "clusterRole"
+  ],
+  "type": "object"
+}

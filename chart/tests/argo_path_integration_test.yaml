@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - Argo Path Logic Integration
+templates:
+  - argocd/app-of-apps.yaml
+tests:
+  - it: Mode 1 - pathOverride takes precedence over everything
+    set:
+      argo:
+        pathOverride: "complete/override/path"
+        pathPrefix: "ignored-prefix"
+        pathSuffix: "ignored-suffix"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "complete/override/path"
+
+  - it: Mode 2 - pathPrefix and pathSuffix both set
+    set:
+      argo:
+        pathOverride: null
+        pathPrefix: "environments/prod"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "environments/prod/k8s-student/applications"
+
+  - it: Mode 3 - pathPrefix set, pathSuffix not set
+    set:
+      argo:
+        pathOverride: null
+        pathPrefix: "clusters/staging"
+        pathSuffix: null
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "clusters/staging/k8s-student"
+
+  - it: Mode 4 - pathPrefix not set, pathSuffix set
+    set:
+      argo:
+        pathOverride: null
+        pathPrefix: null
+        pathSuffix: "manifests"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student/manifests"
+
+  - it: Mode 5 - neither pathPrefix nor pathSuffix set
+    set:
+      argo:
+        pathOverride: null
+        pathPrefix: null
+        pathSuffix: null
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student"
+
+  - it: Edge case - empty strings should behave like null
+    set:
+      argo:
+        pathOverride: ""
+        pathPrefix: ""
+        pathSuffix: ""
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student"
+
+  - it: Mixed case - pathOverride empty, prefix set, suffix empty
+    set:
+      argo:
+        pathOverride: ""
+        pathPrefix: "env/test"
+        pathSuffix: ""
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/test/k8s-student"
+
+  - it: Mixed case - pathOverride empty, prefix empty, suffix set
+    set:
+      argo:
+        pathOverride: ""
+        pathPrefix: ""
+        pathSuffix: "configs"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student/configs"
+
+  - it: Validation - pathOverride overrides defaults from values.yaml
+    set:
+      argo:
+        pathOverride: "totally/different/path"
+        # Don't set pathPrefix/pathSuffix to test with defaults
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "totally/different/path"
+
+  - it: Validation - uses defaults when all path values are null
+    set:
+      argo:
+        pathOverride: null
+        pathPrefix: null
+        pathSuffix: null
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student"

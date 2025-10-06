@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - projectName (Direct Testing)
+templates:
+  - namespace.yaml
+tests:
+  - it: should return the projectName from values when set
+    set:
+      projectName: "test-project-123"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "test-project-123"
+
+  - it: should use the default projectName from values.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "k8s-student"
+
+  - it: should fail validation when projectName is null
+    set:
+      projectName: null
+    asserts:
+      - failedTemplate:
+          errorMessage: "projectName is required"
+
+  - it: should fail validation when projectName is empty
+    set:
+      projectName: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: "projectName is required"
+
+  - it: should handle projectName with hyphens and numbers
+    set:
+      projectName: "my-app-v2-test"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "my-app-v2-test"
+
+  - it: should handle projectName with lowercase
+    set:
+      projectName: "lowercaseproject"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "lowercaseproject"
+
+  - it: should be used consistently across namespace metadata
+    set:
+      projectName: "consistency-test"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "consistency-test"
+      - isKind:
+          of: Namespace
+      - hasDocuments:
+          count: 1

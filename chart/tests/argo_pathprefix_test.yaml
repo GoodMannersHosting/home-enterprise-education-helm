@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - argo.pathPrefix
+templates:
+  - argocd/app-of-apps.yaml
+tests:
+  - it: should return pathPrefix when set
+    set:
+      argo:
+        pathPrefix: "environments/dev"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "environments/dev/k8s-student/applications"
+
+  - it: should return empty string when pathPrefix is not set
+    set:
+      argo:
+        pathPrefix: null
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student/applications"
+
+  - it: should handle pathPrefix with trailing slash
+    set:
+      argo:
+        pathPrefix: "environments/dev/"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "environments/dev//k8s-student/applications"
+
+  - it: should handle pathPrefix with multiple levels
+    set:
+      argo:
+        pathPrefix: "cluster/prod/team-a"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "cluster/prod/team-a/k8s-student/applications"
+
+  - it: should handle pathPrefix with special characters
+    set:
+      argo:
+        pathPrefix: "env-prod_v2"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env-prod_v2/k8s-student/applications"
+
+  - it: should use default empty string when pathPrefix is empty string
+    set:
+      argo:
+        pathPrefix: ""
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student/applications"
+
+  - it: should handle pathPrefix without pathSuffix
+    set:
+      argo:
+        pathPrefix: "environments/staging"
+        pathSuffix: null
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "environments/staging/k8s-student"
+
+  - it: should handle single character pathPrefix
+    set:
+      argo:
+        pathPrefix: "x"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "x/k8s-student/applications"

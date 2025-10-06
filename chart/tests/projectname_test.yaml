@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - projectName
+templates:
+  - namespace.yaml
+tests:
+  - it: should return the projectName from values
+    set:
+      projectName: "test-project"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "test-project"
+
+  - it: should fail when projectName is not provided
+    set:
+      projectName: null
+    asserts:
+      - failedTemplate:
+          errorMessage: "projectName is required"
+
+  - it: should fail when projectName is empty string
+    set:
+      projectName: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: "projectName is required"
+
+  - it: should handle projectName with special characters
+    set:
+      projectName: "my-test-project-123"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "my-test-project-123"
+
+  - it: should work with default values from values.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "k8s-student"

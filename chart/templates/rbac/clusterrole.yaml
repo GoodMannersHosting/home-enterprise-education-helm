@@ -1,0 +1,11 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ printf "project:%s:restrictedclusteraccess" (include "projectName" .) | quote }}
+rules:
+{{- range .Values.rbac.readOnlyAllowedClusterResources }}
+- apiGroups: {{ .apiGroups }}
+  resources: {{ .resources }}
+  verbs: [ "list", "get", "watch" ]
+{{- end }}

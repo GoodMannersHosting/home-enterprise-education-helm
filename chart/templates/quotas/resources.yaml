@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.34.1/resourcequota.json
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ printf "%s-quota" .Values.projectName | quote }}
+  namespace: {{ (include "projectName" .) | quote }}
+spec:
+  hard:
+    limits.cpu: {{ include "limitCPU" . | default "4" }}
+    limits.memory: {{ include "limitMemory" . | default "Gi" }}
+    limits.ephemeral-storage: {{ include "limitEphemeralStorage" . | default "Gi" }}
+    {{- if .Values.quotas.gpu.enabled | default true }}
+    limits.nvidia.com/gpu: {{ include "limitGPU" . | default "0" }}
+    {{- end }}
+    persistentvolumeclaims: {{ include "limitPersistentVolumeClaims" . | default "4" }}

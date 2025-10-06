@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.34.1/limitrange.json
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ printf "%s-storagelimits" .Values.projectName | quote }}
+  namespace: {{ (include "projectName" .) | quote }}
+spec:
+  limits:
+  - type: PersistentVolumeClaim
+    max:
+      storage: {{ .Values.quotas.storage.requests.max | default "8Gi" | quote }}
+    min:
+      storage: {{ .Values.quotas.storage.requests.min | default "1Gi" | quote }}

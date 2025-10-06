@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - argo.pathOverride
+templates:
+  - argocd/app-of-apps.yaml
+tests:
+  - it: should use pathOverride when set and ignore prefix/suffix
+    set:
+      argo:
+        pathOverride: "custom/complete/path"
+        pathPrefix: "ignored"
+        pathSuffix: "ignored"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "custom/complete/path"
+
+  - it: should use pathOverride with deep path structure
+    set:
+      argo:
+        pathOverride: "clusters/prod/region-us-west/team-alpha/applications"
+        pathPrefix: "ignored"
+        pathSuffix: "ignored"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "clusters/prod/region-us-west/team-alpha/applications"
+
+  - it: should use pathOverride with single level
+    set:
+      argo:
+        pathOverride: "apps"
+        pathPrefix: "ignored"
+        pathSuffix: "ignored"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "apps"
+
+  - it: should use pathOverride with special characters
+    set:
+      argo:
+        pathOverride: "custom_path-v2/test.env"
+        pathPrefix: "ignored"
+        pathSuffix: "ignored"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "custom_path-v2/test.env"
+
+  - it: should fall back to prefix/suffix when pathOverride is null
+    set:
+      argo:
+        pathOverride: null
+        pathPrefix: "env"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/k8s-student/applications"
+
+  - it: should fall back to prefix/suffix when pathOverride is empty string
+    set:
+      argo:
+        pathOverride: ""
+        pathPrefix: "env"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/k8s-student/applications"
+
+  - it: should use pathOverride even when it looks like projectName
+    set:
+      argo:
+        pathOverride: "k8s-student"
+        pathPrefix: "environments"
+        pathSuffix: "applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student"
+
+  - it: should handle pathOverride with trailing slash
+    set:
+      argo:
+        pathOverride: "custom/path/"
+        pathPrefix: "ignored"
+        pathSuffix: "ignored"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "custom/path/"
+
+  - it: should handle pathOverride with leading slash
+    set:
+      argo:
+        pathOverride: "/absolute/path"
+        pathPrefix: "ignored"
+        pathSuffix: "ignored"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "/absolute/path"
+
+  - it: should handle pathOverride with dots
+    set:
+      argo:
+        pathOverride: "./relative/path"
+        pathPrefix: "ignored"
+        pathSuffix: "ignored"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "./relative/path"

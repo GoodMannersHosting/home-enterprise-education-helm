@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - limitCPU
+templates:
+  - quotas/resources.yaml
+tests:
+  - it: should handle millicores and round to nearest 100m
+    set:
+      quotas:
+        compute:
+          cpu: "1250m"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "1300m"
+
+  - it: should handle millicores already ending in 00m
+    set:
+      quotas:
+        compute:
+          cpu: "6000m"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "6000m"
+
+  - it: should round up millicores properly
+    set:
+      quotas:
+        compute:
+          cpu: "850m"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "900m"
+
+  - it: should round down millicores properly
+    set:
+      quotas:
+        compute:
+          cpu: "840m"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "800m"
+
+  - it: should handle whole integer values without m suffix
+    set:
+      quotas:
+        compute:
+          cpu: "4"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "4"
+
+  - it: should handle whole integer as string
+    set:
+      quotas:
+        compute:
+          cpu: "8"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "8"
+
+  - it: should use template default when cpu not specified
+    set:
+      quotas:
+        compute:
+          cpu: null # Explicitly null to test default
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "4000m"
+
+  - it: should handle edge case of 50m (should round to 100m)
+    set:
+      quotas:
+        compute:
+          cpu: "50m"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "100m"
+
+  - it: should handle large millicores values
+    set:
+      quotas:
+        compute:
+          cpu: "15750m"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "15800m"
+
+  - it: should handle small whole numbers
+    set:
+      quotas:
+        compute:
+          cpu: "1"
+    asserts:
+      - equal:
+          path: spec.hard["limits.cpu"]
+          value: "1"

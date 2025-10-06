@@ -1,0 +1,31 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ include "projectName" . | quote }}
+  namespace: {{ .Values.argo.appOfAppsNamespace | default "argocd" | quote }}
+spec:
+  destination:
+    namespace: {{ include "projectName" . | quote }}
+    server: "https://kubernetes.default.svc"
+  project: {{ include "projectName" . | quote }}
+  sources:
+  - repoURL: {{ .Values.argo.targetRepoURL | required "argo.targetRepoURL is required" | quote }}
+    targetRevision: {{ .Values.argo.targetRevision | default "main" | quote }}
+{{- if .Values.argo.pathOverride }}
+    {{/* PathOverride: Use complete override, ignore prefix/suffix/projectName */}}
+    path: {{ include "argo.pathOverride" . | quote }}
+{{- else if and .Values.argo.pathPrefix .Values.argo.pathSuffix -}}
+    {{/* Mode 1: pathPrefix and pathSuffix */}}
+    path: {{ printf "%s/%s/%s" (include "argo.pathPrefix" .) (include "projectName" .) (include "argo.pathSuffix" .) | quote }}
+{{- else if and .Values.argo.pathPrefix (not .Values.argo.pathSuffix) -}}
+    {{/* Mode 2: pathPrefix and not pathSuffix */}}
+    path: {{ printf "%s/%s" (include "argo.pathPrefix" .) (include "projectName" .) | quote }}
+{{- else if and (not .Values.argo.pathPrefix) .Values.argo.pathSuffix -}}
+    {{/* Mode 3: not pathPrefix and pathSuffix */}}
+    path: {{ printf "%s/%s" (include "projectName" .) (include "argo.pathSuffix" .) | quote }}
+{{- else -}}
+    {{/* Mode 4: not pathPrefix or pathSuffix */}}
+    path: {{ include "projectName" . | quote }}
+{{- end }}
+    directory: {} # We don't want to dive into the disabled directory, so recurse will not be set.

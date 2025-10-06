@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - limitMemory
+templates:
+  - quotas/resources.yaml
+tests:
+  - it: should handle Gi units correctly
+    set:
+      quotas:
+        compute:
+          memory: "12Gi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "12Gi"
+
+  - it: should handle Mi units and round to nearest 100Mi
+    set:
+      quotas:
+        compute:
+          memory: "1250Mi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "1300Mi"
+
+  - it: should handle Mi units already ending in 00Mi
+    set:
+      quotas:
+        compute:
+          memory: "8000Mi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "8000Mi"
+
+  - it: should round up Mi units properly
+    set:
+      quotas:
+        compute:
+          memory: "1875Mi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "1900Mi"
+
+  - it: should round down Mi units properly
+    set:
+      quotas:
+        compute:
+          memory: "1840Mi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "1800Mi"
+
+  - it: should convert plain numbers to Mi units
+    set:
+      quotas:
+        compute:
+          memory: "2048"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "2048Mi"
+
+  - it: should use template default when memory not specified
+    set:
+      quotas:
+        compute:
+          memory: null # Explicitly null to test default
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "8Gi"
+
+  - it: should handle large Gi values
+    set:
+      quotas:
+        compute:
+          memory: "64Gi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "64Gi"
+
+  - it: should handle small Mi values
+    set:
+      quotas:
+        compute:
+          memory: "512Mi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "500Mi"
+
+  - it: should handle edge case Mi rounding
+    set:
+      quotas:
+        compute:
+          memory: "50Mi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.memory"]
+          value: "100Mi"

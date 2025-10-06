@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - argo.pathSuffix
+templates:
+  - argocd/app-of-apps.yaml
+tests:
+  - it: should return pathSuffix when set
+    set:
+      argo:
+        pathPrefix: "environments"
+        pathSuffix: "manifests"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "environments/k8s-student/manifests"
+
+  - it: should use default applications when pathSuffix is not set
+    set:
+      argo:
+        pathPrefix: "environments"
+        pathSuffix: null
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "environments/k8s-student"
+
+  - it: should handle pathSuffix with multiple levels
+    set:
+      argo:
+        pathPrefix: "env"
+        pathSuffix: "k8s/manifests"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/k8s-student/k8s/manifests"
+
+  - it: should handle pathSuffix with special characters
+    set:
+      argo:
+        pathPrefix: "env"
+        pathSuffix: "apps_v2-prod"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/k8s-student/apps_v2-prod"
+
+  - it: should use default applications when pathSuffix is empty string
+    set:
+      argo:
+        pathPrefix: "env"
+        pathSuffix: ""
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/k8s-student"
+
+  - it: should handle pathSuffix without pathPrefix
+    set:
+      argo:
+        pathPrefix: null
+        pathSuffix: "deployment-configs"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "k8s-student/deployment-configs"
+
+  - it: should handle single character pathSuffix
+    set:
+      argo:
+        pathPrefix: "env"
+        pathSuffix: "y"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/k8s-student/y"
+
+  - it: should handle pathSuffix with leading slash
+    set:
+      argo:
+        pathPrefix: "env"
+        pathSuffix: "/applications"
+    asserts:
+      - equal:
+          path: spec.sources[0].path
+          value: "env/k8s-student//applications"

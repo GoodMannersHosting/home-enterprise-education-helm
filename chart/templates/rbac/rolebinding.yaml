@@ -1,0 +1,14 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ printf "group:project:%s" (include "projectName" .) | quote }}
+  namespace: {{ (include "projectName" .) | quote }}
+subjects:
+- kind: Group
+  name: {{ printf "%s%s" .Values.oidc.groupPrefix (include "projectName" .) | quote }}
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: {{ printf "project:%s" (include "projectName" .) | quote }}
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - projectName (Helper Output Testing)
+templates:
+  - quotas/resources.yaml
+tests:
+  - it: should output projectName correctly in ResourceQuota metadata
+    set:
+      projectName: "quota-test"
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "quota-test"
+      - equal:
+          path: metadata.name
+          value: "quota-test-quota"
+
+  - it: should handle default projectName in ResourceQuota
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: "k8s-student"
+      - equal:
+          path: metadata.name
+          value: "k8s-student-quota"
+
+  - it: should fail when projectName is missing
+    set:
+      projectName: null
+    asserts:
+      - failedTemplate:
+          errorMessage: "projectName is required"
+
+  - it: should render ResourceQuota with correct structure
+    set:
+      projectName: "structure-test"
+    asserts:
+      - isKind:
+          of: ResourceQuota
+      - equal:
+          path: metadata.namespace
+          value: "structure-test"
+      - exists:
+          path: spec.hard
+      - exists:
+          path: metadata.name

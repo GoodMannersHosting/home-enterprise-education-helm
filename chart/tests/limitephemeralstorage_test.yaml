@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Helper Functions - limitEphemeralStorage
+templates:
+  - quotas/resources.yaml
+tests:
+  - it: should handle Gi units correctly
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "50Gi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.ephemeral-storage"]
+          value: "50Gi"
+
+  - it: should handle large Gi values
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "100Gi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.ephemeral-storage"]
+          value: "100Gi"
+
+  - it: should handle small Gi values
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "1Gi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.ephemeral-storage"]
+          value: "1Gi"
+
+  - it: should use template default when ephemeralStorage not specified
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: null # Explicitly null to test default
+    asserts:
+      - equal:
+          path: spec.hard["limits.ephemeral-storage"]
+          value: "20Gi"
+
+  - it: should fail validation when Mi units are used
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "20480Mi"
+    asserts:
+      - failedTemplate:
+          errorMessage: "ephemeralStorage must be specified in Gi units (e.g., '20Gi'), got: 20480Mi"
+
+  - it: should fail validation when Ti units are used
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "1Ti"
+    asserts:
+      - failedTemplate:
+          errorMessage: "ephemeralStorage must be specified in Gi units (e.g., '20Gi'), got: 1Ti"
+
+  - it: should fail validation when Ki units are used
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "20971520Ki"
+    asserts:
+      - failedTemplate:
+          errorMessage: "ephemeralStorage must be specified in Gi units (e.g., '20Gi'), got: 20971520Ki"
+
+  - it: should fail validation when plain numbers are used
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "20"
+    asserts:
+      - failedTemplate:
+          errorMessage: "ephemeralStorage must be specified in Gi units (e.g., '20Gi'), got: 20"
+
+  - it: should fail validation when bytes units are used
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "21474836480"
+    asserts:
+      - failedTemplate:
+          errorMessage: "ephemeralStorage must be specified in Gi units (e.g., '20Gi'), got: 21474836480"
+
+  - it: should fail validation when wrong suffix is used
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "20G"
+    asserts:
+      - failedTemplate:
+          errorMessage: "ephemeralStorage must be specified in Gi units (e.g., '20Gi'), got: 20G"
+
+  - it: should handle zero Gi value
+    set:
+      quotas:
+        compute:
+          ephemeralStorage: "0Gi"
+    asserts:
+      - equal:
+          path: spec.hard["limits.ephemeral-storage"]
+          value: "0Gi"
